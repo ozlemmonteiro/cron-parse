@@ -22,3 +22,10 @@ Cron parsing is a small problem that keeps getting solved badly with heavy depen
 ## The awkward edge
 
 When both day-of-month and day-of-week are restricted (neither is `*`), POSIX specifies **OR** semantics: a day qualifies if *either* field matches. Many implementations historically disagree. This library implements POSIX OR. If your expression is `0 0 1 * 0` and the 1st is a Saturday, the job fires the following Sunday — not skipped to the next month. If you need AND semantics (fire only when the 1st is a Sunday), this library is the wrong tool and that choice will be silent, so check now.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
